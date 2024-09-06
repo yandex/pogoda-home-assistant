@@ -19,7 +19,7 @@ Currently Yandex provides free keys for Home Assistant for new users here: https
 - Go to HACS
 - Click on the 3 dots in the top right corner.
 - Select "Custom repositories"
-- Add the URL to the repository: {todo: hithub url}
+- Add URL to repository: https://github.com/yandex/pogoda-home-assistant
 - Select: integration
 - Click the "ADD" button.
 
