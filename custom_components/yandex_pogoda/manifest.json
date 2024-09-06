@@ -1,0 +1,11 @@
+{
+  "domain": "yandex_pogoda",
+  "name": "Yandex Pogoda",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/yandex/pogoda-home-assistant/wiki",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/yandex/pogoda-home-assistant/issues",
+  "requirements": [],
+  "version": "0.0.1"
+}

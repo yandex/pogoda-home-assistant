@@ -1,0 +1,46 @@
+{
+  "options": {
+    "abort": {
+      "already_configured": "This location is already used for Yandex.Pogoda."
+    },
+    "error": {
+      "could_not_get_data": "Could not get data. Check your API key in Yandex developer portal. It may took up to 5 minutes for updating key settings at Yandex side."
+    },
+    "step": {
+      "init": {
+        "title": "Yandex.Pogoda settings",
+        "description": "Settings for Yandex Pogoda integration.\n\nCheck [Yandex.Pogoda API for Smart Home](https://yandex.ru/pogoda/b2b/smarthome) to get your API key",
+        "data": {
+          "api_key": "Yandex.Pogoda API key",
+          "latitude": "Latitude for weather info (default is HA latitude)",
+          "longitude": "Longitude for weather info (default is HA longitude)",
+          "language": "Language for Yandex weather state sensor",
+          "image_source": "Weather condition images"
+        }
+      }
+    }
+  },
+  "config": {
+    "abort": {
+      "already_configured": "This location is already used for Yandex.Pogoda."
+    },
+    "error": {
+      "could_not_get_data": "Could not get data. Check your API key in Yandex developer portal. It may took up to 5 minutes for updating key settings at Yandex side."
+    },
+    "step": {
+      "user": {
+        "title": "Yandex.Pogoda settings",
+        "description": "Settings for Yandex Pogoda integration.\n\nCheck [Yandex.Pogoda API for Smart Home](https://yandex.ru/pogoda/b2b/smarthome) to get your API key",
+        "data": {
+          "api_key": "Yandex.Pogoda API key",
+          "name": "Name",
+          "latitude": "Latitude for weather info (default is HA latitude)",
+          "longitude": "Longitude for weather info (default is HA longitude)",
+          "language": "Language for Yandex weather state sensor",
+          "image_source": "Weather condition images"
+        }
+      }
+    }
+  },
+  "title": "Yandex Pogoda"
+}
