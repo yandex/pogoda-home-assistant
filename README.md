@@ -30,13 +30,13 @@ Currently Yandex provides free keys for Home Assistant for new users here: https
 ## Configuration
 
 1. Go to Yandex [smarthome page](https://yandex.ru/pogoda/b2b/smarthome)
-2. Get free Weather API key
+2. Get free Yandex.Weather.API key
 3. It may require up to 5 minutes for Yandex to activate new key.
 4. Save API key
 5. Go to Home Assistant settings
    - Integrations
    - Add
-   - Start typing "Yandex weather" _(clean browser cache if nothing found)_
+   - Start typing "Yandex Pogoda" _(clean browser cache if nothing found)_
    - Add integration
    - Put API key into API key field
 
@@ -46,7 +46,7 @@ Currently Yandex provides free keys for Home Assistant for new users here: https
 
 - attribute forecast icons with Yandex forecast weather state images
 - temperature, wind speed and other unit may be customized
-- forecast data is available for periods (night/morning/day/evening/)
+- forecast data is available for periods (night/morning/day/evening)
 
 #### attributes
 
