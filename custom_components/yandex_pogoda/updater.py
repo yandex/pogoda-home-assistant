@@ -13,18 +13,12 @@ from datetime import timedelta
 from dateutil import parser
 
 from homeassistant.components.weather import (
-    ATTR_FORECAST_APPARENT_TEMP,
     ATTR_FORECAST_CONDITION,
     ATTR_FORECAST_NATIVE_APPARENT_TEMP,
     ATTR_FORECAST_NATIVE_TEMP,
-    ATTR_FORECAST_NATIVE_TEMP_LOW,
     ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
     ATTR_FORECAST_NATIVE_WIND_SPEED,
-    ATTR_FORECAST_TEMP,
-    ATTR_FORECAST_TEMP_LOW,
     ATTR_FORECAST_WIND_BEARING,
-    ATTR_FORECAST_WIND_GUST_SPEED,
-    ATTR_FORECAST_WIND_SPEED,
     Forecast,
 )
 from homeassistant.core import HomeAssistant, HomeAssistantError, callback
@@ -141,22 +135,14 @@ CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
 FORECAST_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
     AttributeMapper(ATTR_API_WIND_BEARING, ATTR_FORECAST_WIND_BEARING),
     AttributeMapper(ATTR_API_WIND_SPEED, ATTR_FORECAST_NATIVE_WIND_SPEED, default=0),
-    AttributeMapper(ATTR_API_WIND_SPEED, ATTR_FORECAST_WIND_SPEED, default=0),
     AttributeMapper(
         ATTR_API_FEELS_LIKE_TEMPERATURE, ATTR_FORECAST_NATIVE_APPARENT_TEMP
     ),
-    AttributeMapper(ATTR_API_FEELS_LIKE_TEMPERATURE, ATTR_FORECAST_APPARENT_TEMP),
     AttributeMapper(ATTR_API_TEMPERATURE, ATTR_FORECAST_NATIVE_TEMP),
-    AttributeMapper(ATTR_API_TEMPERATURE, ATTR_FORECAST_TEMP),
-    AttributeMapper(ATTR_API_TEMPERATURE, ATTR_FORECAST_NATIVE_TEMP_LOW),
-    AttributeMapper(ATTR_API_TEMPERATURE, ATTR_FORECAST_TEMP_LOW),
     AttributeMapper(
         ATTR_API_CONDITION, ATTR_FORECAST_CONDITION, mapping=WEATHER_STATES_CONVERSION
     ),
-    AttributeMapper(ATTR_API_WIND_BEARING, ATTR_FORECAST_WIND_BEARING),
     AttributeMapper(ATTR_API_WIND_GUST, ATTR_FORECAST_NATIVE_WIND_GUST_SPEED),
-    AttributeMapper(ATTR_API_WIND_GUST, ATTR_FORECAST_WIND_GUST_SPEED),
-    AttributeMapper(ATTR_API_WIND_SPEED, ATTR_FORECAST_WIND_SPEED),
 ]
 
 
@@ -257,7 +243,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         low_fc_temperatures: list[float] = []
 
         for f in forecasts:
-            f_low_temperature: float = f.get(ATTR_FORECAST_NATIVE_TEMP_LOW, None)
+            f_low_temperature: float = f.get(ATTR_FORECAST_NATIVE_TEMP, None)
             if f_low_temperature is not None:
                 low_fc_temperatures.append(f_low_temperature)
 

@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timezone
 import logging
 
 from homeassistant.components.weather import (
-    ATTR_WEATHER_TEMPERATURE_UNIT,
-    ATTR_WEATHER_WIND_SPEED_UNIT,
-    UNIT_CONVERSIONS,
     Forecast,
     WeatherEntity,
     WeatherEntityFeature,
@@ -16,6 +14,7 @@ from homeassistant.components.weather import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
     UnitOfSpeed,
     UnitOfTemperature,
 )
@@ -38,12 +37,24 @@ from .const import (
     ATTRIBUTION,
     DOMAIN,
     ENTRY_NAME,
+    TEMPERATURE_CONVERTER,
     UPDATER,
+    WIND_SPEED_CONVERTER,
+    convert_unit_value,
 )
 from .device_trigger import TRIGGERS
 from .updater import WeatherUpdater
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _get_converter(
+    converter: Callable[[float, str, str], float], unit_from: str, unit_to: str
+) -> Callable[[float], float | None]:
+    def wrap(value: float) -> float | None:
+        return convert_unit_value(converter, value, unit_from, unit_to)
+
+    return wrap
 
 
 async def async_setup_entry(
@@ -99,54 +110,41 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             await self.coordinator.async_config_entry_first_refresh()
             return
 
-        if state.state == STATE_UNAVAILABLE:
+        if state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             self._attr_available = False
             await self.coordinator.async_config_entry_first_refresh()
         else:
             _LOGGER.debug(f"state for restore: {state}")
             self._attr_available = True
             self._attr_condition = state.state
-            for attribute, converter in [
-                ("temperature", UNIT_CONVERSIONS[ATTR_WEATHER_TEMPERATURE_UNIT]),
-                ("wind_speed", UNIT_CONVERSIONS[ATTR_WEATHER_WIND_SPEED_UNIT]),
-            ]:
-                try:
-                    setattr(
-                        self,
-                        f"_attr_native_{attribute}",
-                        converter(
-                            state.attributes.get(attribute),
-                            state.attributes.get(
-                                f"_{attribute}_unit",
-                                getattr(self, f"_attr_native_{attribute}_unit"),
-                            ),
-                            getattr(self, f"_attr_native_{attribute}_unit"),
-                        ),
-                    )
-                except TypeError:
-                    pass
+            temp_converter = _get_converter(
+                TEMPERATURE_CONVERTER,
+                state.attributes.get("temperature_unit")
+                or self._weather_option_temperature_unit,
+                self._attr_native_temperature_unit,
+            )
+            ws_converter = _get_converter(
+                WIND_SPEED_CONVERTER,
+                state.attributes.get("wind_speed_unit")
+                or self._weather_option_wind_speed_unit,
+                self._attr_native_wind_speed_unit,
+            )
 
+            self._attr_native_temperature = temp_converter(
+                state.attributes.get("temperature")
+            )
+            self._attr_native_wind_speed = ws_converter(
+                state.attributes.get("wind_speed")
+            )
+            self._attr_native_wind_gust_speed = ws_converter(
+                state.attributes.get("windGust")
+            )
+            self._attr_native_apparent_temperature = temp_converter(
+                state.attributes.get("feelsLike")
+            )
             self._attr_wind_bearing = state.attributes.get("wind_bearing")
             self._attr_entity_picture = state.attributes.get("entity_picture")
             self._hourly_forecast = state.attributes.get(ATTR_FORECAST_DATA, [])
-
-            for f in self._hourly_forecast:
-                for attribute, converter in [
-                    ("temperature", UNIT_CONVERSIONS[ATTR_WEATHER_TEMPERATURE_UNIT]),
-                    ("wind_speed", UNIT_CONVERSIONS[ATTR_WEATHER_WIND_SPEED_UNIT]),
-                ]:
-                    try:
-                        f[attribute] = converter(
-                            f.get(attribute),
-                            getattr(
-                                self,
-                                f"_{attribute}_unit",
-                                getattr(self, f"_attr_native_{attribute}_unit"),
-                            ),
-                            getattr(self, f"_attr_native_{attribute}_unit"),
-                        )
-                    except TypeError:
-                        pass
 
             self._attr_extra_state_attributes = {
                 ATTR_FORECAST_DATA: self._hourly_forecast,
@@ -197,7 +195,7 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             ATTR_API_FORECAST_ICONS: self.coordinator.data.get(ATTR_API_FORECAST_ICONS),
             ATTR_FORECAST_DATA: self.__forecast_hourly(),
         }
-
+        # self.coordinator.async_refresh()
         self.async_write_ha_state()
 
     def update_condition_and_fire_event(self, new_condition: str):

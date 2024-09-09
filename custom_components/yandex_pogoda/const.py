@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
+from homeassistant.components.weather import (
+    ATTR_WEATHER_TEMPERATURE_UNIT,
+    ATTR_WEATHER_WIND_SPEED_UNIT,
+    UNIT_CONVERSIONS,
+)
 from homeassistant.const import Platform
 
 DOMAIN = "yandex_pogoda"
 DEFAULT_NAME = "Yandex Pogoda"
-DEFAULT_UPDATES_PER_DAY = 16
+DEFAULT_UPDATES_PER_DAY = 700
 ATTRIBUTION = "Data provided by Yandex Pogoda"
 MANUFACTURER = "Yandex"
 ENTRY_NAME = "name"
@@ -83,6 +90,21 @@ CONDITION_ICONS = {
     "THUNDERSTORM_WITH_HAIL": "mdi:weather-lightning-rainy",
 }
 """Mapping for state icon"""
+
+TEMPERATURE_CONVERTER = UNIT_CONVERSIONS[ATTR_WEATHER_TEMPERATURE_UNIT]
+WIND_SPEED_CONVERTER = UNIT_CONVERSIONS[ATTR_WEATHER_WIND_SPEED_UNIT]
+
+
+def convert_unit_value(
+    converter: Callable[[float, str, str], float],
+    val: float,
+    unit_from: str,
+    unit_to: str,
+) -> float | None:
+    """Weather factor unit converter."""
+    if val is not None and unit_from and unit_to:
+        return converter(val, unit_from, unit_to)
+    return None
 
 
 def map_state(src: str, is_day: bool, mapping: dict | None = None) -> str:

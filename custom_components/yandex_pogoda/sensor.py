@@ -30,14 +30,26 @@ from .const import (
     ATTR_API_SERVER_TIME,
     ATTR_API_WIND_BEARING,
     ATTR_API_WIND_SPEED,
+    ATTR_API_WIND_GUST,
     ATTR_API_YA_CONDITION,
     ATTR_MIN_FORECAST_TEMPERATURE,
     ATTRIBUTION,
     DOMAIN,
     ENTRY_NAME,
+    TEMPERATURE_CONVERTER,
     UPDATER,
+    WIND_SPEED_CONVERTER,
+    convert_unit_value,
 )
 from .updater import WeatherUpdater
+
+UNIT_CONVERTOR_TYPE_MAP: dict[str, str] = {
+    ATTR_API_TEMPERATURE: TEMPERATURE_CONVERTER,
+    ATTR_API_FEELS_LIKE_TEMPERATURE: TEMPERATURE_CONVERTER,
+    ATTR_API_WIND_SPEED: WIND_SPEED_CONVERTER,
+    ATTR_API_WIND_GUST: WIND_SPEED_CONVERTER,
+    ATTR_MIN_FORECAST_TEMPERATURE: TEMPERATURE_CONVERTER,
+}
 
 WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
@@ -59,6 +71,14 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key=ATTR_API_WIND_SPEED,
         name="Wind speed",
+        native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=True,
+        icon="mdi:weather-windy",
+    ),
+    SensorEntityDescription(
+        key=ATTR_API_WIND_GUST,
+        name="Wind gust",
         native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
         state_class=SensorStateClass.MEASUREMENT,
         entity_registry_enabled_default=True,
@@ -156,12 +176,21 @@ class YandexWeatherSensor(SensorEntity, CoordinatorEntity, RestoreEntity):
         if not state:
             return
 
-        if state.state == STATE_UNAVAILABLE or state.state == STATE_UNKNOWN:
+        if state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             self._attr_available = False
         else:
             self._attr_available = True
             if self.entity_description.key == ATTR_API_SERVER_TIME:
                 self._attr_native_value = parser.parse(state.state)
+            elif self.entity_description.key in UNIT_CONVERTOR_TYPE_MAP:
+                self._attr_native_value = str(
+                    convert_unit_value(
+                        UNIT_CONVERTOR_TYPE_MAP[self.entity_description.key],
+                        float(state.state),
+                        self.unit_of_measurement,
+                        self.native_unit_of_measurement,
+                    )
+                )
             else:
                 self._attr_native_value = state.state
 

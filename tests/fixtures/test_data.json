@@ -1,0 +1,111 @@
+{
+  "data": {
+    "serverTime": "2024-09-06T14:47:26.111484847+03:00",
+    "weatherByPoint": {
+      "now": {
+        "condition": "CLEAR",
+        "daytime": "DAY",
+        "feelsLike": 36,
+        "icon": "png.png",
+        "temperature": 31,
+        "windAngle": 244,
+        "windGust": 9.1,
+        "windSpeed": 5.8
+      },
+      "forecast": {
+        "days": [
+          {
+            "time": "2024-09-06T00:00:00+03:00",
+            "parts": {
+              "night": {
+                "condition": "PARTLY_CLOUDY",
+                "daytime": "NIGHT",
+                "feelsLike": 31,
+                "icon": "png.png",
+                "temperature": 30,
+                "windAngle": 225,
+                "windGust": 9.3,
+                "windSpeed": 8.3
+              },
+              "morning": {
+                "condition": "PARTLY_CLOUDY",
+                "daytime": "DAY",
+                "feelsLike": 31,
+                "icon": "png.png",
+                "temperature": 30,
+                "windAngle": 225,
+                "windGust": 10.6,
+                "windSpeed": 9.6
+              },
+              "day": {
+                "condition": "CLOUDY",
+                "daytime": "DAY",
+                "feelsLike": 35,
+                "icon": "png.png",
+                "temperature": 31,
+                "windAngle": 225,
+                "windGust": 9.1,
+                "windSpeed": 8
+              },
+              "evening": {
+                "condition": "CLOUDY",
+                "daytime": "NIGHT",
+                "feelsLike": 33,
+                "icon": "png.png",
+                "temperature": 30,
+                "windAngle": 225,
+                "windGust": 6.3,
+                "windSpeed": 5.5
+              }
+            }
+          },
+          {
+            "time": "2024-09-07T00:00:00+03:00",
+            "parts": {
+              "night": {
+                "condition": "CLOUDY",
+                "daytime": "NIGHT",
+                "feelsLike": 29,
+                "icon": "png.png",
+                "temperature": 30,
+                "windAngle": 225,
+                "windGust": 12.8,
+                "windSpeed": 11.8
+              },
+              "morning": {
+                "condition": "PARTLY_CLOUDY",
+                "daytime": "DAY",
+                "feelsLike": 31,
+                "icon": "png.png",
+                "temperature": 25,
+                "windAngle": 225,
+                "windGust": 12.1,
+                "windSpeed": 11.1
+              },
+              "day": {
+                "condition": "PARTLY_CLOUDY",
+                "daytime": "DAY",
+                "feelsLike": 33,
+                "icon": "png.png",
+                "temperature": 31,
+                "windAngle": 225,
+                "windGust": 11,
+                "windSpeed": 10.1
+              },
+              "evening": {
+                "condition": "PARTLY_CLOUDY",
+                "daytime": "NIGHT",
+                "feelsLike": 32,
+                "icon": "png.png",
+                "temperature": 30,
+                "windAngle": 225,
+                "windGust": 8.3,
+                "windSpeed": 7.8
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
