@@ -13,7 +13,7 @@ from homeassistant.const import Platform
 
 DOMAIN = "yandex_pogoda"
 DEFAULT_NAME = "Yandex Pogoda"
-DEFAULT_UPDATES_PER_DAY = 700
+DEFAULT_UPDATES_PER_DAY = 12
 ATTRIBUTION = "Data provided by Yandex Pogoda"
 MANUFACTURER = "Yandex"
 ENTRY_NAME = "name"
