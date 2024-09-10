@@ -187,7 +187,8 @@ class YandexWeatherSensor(SensorEntity, CoordinatorEntity, RestoreEntity):
                     convert_unit_value(
                         UNIT_CONVERTOR_TYPE_MAP[self.entity_description.key],
                         float(state.state),
-                        state.attributes['unit_of_measurement'],
+                        state.attributes.get('unit_of_measurement') 
+                        or self.unit_of_measurement,
                         self.native_unit_of_measurement,
                     )
                 )
