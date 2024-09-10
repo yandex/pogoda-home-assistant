@@ -120,13 +120,13 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             temp_converter = _get_converter(
                 TEMPERATURE_CONVERTER,
                 state.attributes.get("temperature_unit")
-                or self._weather_option_temperature_unit,
+                or self._attr_native_temperature_unit,
                 self._attr_native_temperature_unit,
             )
             ws_converter = _get_converter(
                 WIND_SPEED_CONVERTER,
                 state.attributes.get("wind_speed_unit")
-                or self._weather_option_wind_speed_unit,
+                or self._attr_native_wind_speed_unit,
                 self._attr_native_wind_speed_unit,
             )
 
