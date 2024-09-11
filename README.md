@@ -59,6 +59,7 @@ Currently Yandex provides free keys for Home Assistant for new users here: https
 - `Minimal forecast temperature` -- minimal temperature for all forecast periods.
 - `Temperature` -- The temperature value in the shade at a height of 2 meters from the ground surface.
 - `Wind bearing` -- The angle of the wind direction.
+- `Wind gust` -- The speed of wind gusts.
 - `Wind speed` -- Wind speed at a height of 10 meters from the ground surface.
 
 Some sensors are disabled by default.
