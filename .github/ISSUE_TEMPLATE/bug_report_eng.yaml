@@ -1,0 +1,61 @@
+name: Bug report (eng)
+description: Create a report to help us improve (for English speaking users)
+body:
+  - type: textarea
+    id: issue
+    validations:
+      required: true
+    attributes:
+      label: The problem
+      description: >-
+        Describe the issue you are experiencing here, to communicate to the
+        maintainers. Tell us what you were trying to do and what happened.
+
+        Provide a clear and concise description of what the problem is.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Environment
+
+  - type: input
+    id: ha_version
+    validations:
+      required: true
+    attributes:
+      label: What version of Home Assistant are you using?
+      placeholder: Core
+      description: >
+        Can be found here: [Settings -> About](https://my.home-assistant.io/redirect/info/)
+
+  - type: checkboxes
+    id: key_validation
+    attributes:
+      label: Check API key
+      description: Please check the boxes if the statements below are true
+      options:
+        - label: in a [customers page](https://yandex.ru/pogoda/b2b/console/smarthome) key status is "Активно"
+          required: true
+        - label: in a [customers page](https://yandex.ru/pogoda/b2b/console/smarthome) key tariff "Бесплатный"
+          required: true
+        - label: in a [customers page](https://yandex.ru/pogoda/b2b/console/smarthome) request counter for key is not zero
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Please attach the log if there is an error message, trace or anything useful in the log
+      description: >
+        [Manual: "hot to enable debug logging"](https://www.home-assistant.io/docs/configuration/troubleshooting/#enabling-debug-logging)
+      render: txt
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional information
+      description: Please if you have additional information write it down here

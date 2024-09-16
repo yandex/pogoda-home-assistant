@@ -1,0 +1,62 @@
+name: Сообщить о проблеме
+description: Если вы столкнулись с проблемой, расскажите нам, мы постараемся помочь
+body:
+  - type: textarea
+    id: issue
+    validations:
+      required: true
+    attributes:
+      label: В чем проблема?
+      description: >-
+        Опишите проблему, с которой вы столкнулись. Расскажите что делаете, что происходит, какое поведенеи вы ожидаете.
+
+        Постарайтесь описать проблему четко и лаконично.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Информация об установке
+
+  - type: input
+    id: ha_version
+    validations:
+      required: true
+    attributes:
+      label: Какая версия Home Assistant используется?
+      placeholder: Core
+      description: >
+        Можно посмотреть тут: Настройки -> О программе
+
+        Либо по ссылке: [Настройки -> О программе](https://my.home-assistant.io/redirect/info/)
+
+  - type: checkboxes
+    id: key_validation
+    attributes:
+      label: Проверка ключа
+      description: проставьте галочки если утверждения ниже верны
+      options:
+        - label: в [личном кабинете](https://yandex.ru/pogoda/b2b/console/smarthome) статус ключа "Активно"
+          required: true
+        - label: в [личном кабинете](https://yandex.ru/pogoda/b2b/console/smarthome) тариф ключа "Бесплатный"
+          required: true
+        - label: в [личном кабинете](https://yandex.ru/pogoda/b2b/console/smarthome) счетчик запросов ключа не равен нулю
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # Детали
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Приложите лог, если в логе есть сообщение об ошибке, trace либо что-нибудь полезное
+      description: >
+        [Инструкция: "как получить лог"](https://www.home-assistant.io/docs/configuration/troubleshooting/#enabling-debug-logging)
+      render: txt
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Дополнительная информация
+      description: Если нужно что-то добавить, напишите здесь
