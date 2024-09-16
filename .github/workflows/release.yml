@@ -53,7 +53,7 @@ jobs:
 
       - name: Update version
         id: update
-        working-directory: ./custom_components/yandex_weather/
+        working-directory: ./custom_components/yandex_pogoda/
         run: |
           sed -e "s/%%%VERSION%%%/${{ env.NEW_VERSION }}/" manifest.json.tpl >manifest.json
           git commit -m "chore(release): ${{ needs.changes.outputs.tag }}" manifest.json
