@@ -42,11 +42,13 @@ from .const import (
     ATTR_API_YA_CONDITION,
     ATTR_FORECAST_DATA,
     ATTR_MIN_FORECAST_TEMPERATURE,
+    ATTR_WIND_BEARING_DIRECTION,
     DEFAULT_UPDATES_PER_DAY,
     CONDITION_ICONS,
     DOMAIN,
     MANUFACTURER,
     WEATHER_STATES_CONVERSION,
+    get_wind_direction,
     map_state,
 )
 
@@ -119,6 +121,12 @@ class AttributeMapper:
 
 CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
     AttributeMapper(ATTR_API_WIND_BEARING),
+    AttributeMapper(
+        ATTR_API_WIND_BEARING,
+        ATTR_WIND_BEARING_DIRECTION,
+        mapping=get_wind_direction,
+        should_translate=True,
+    ),
     AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION, should_translate=True),
     AttributeMapper(
         ATTR_API_CONDITION, f"{ATTR_API_YA_CONDITION}_icon", CONDITION_ICONS
@@ -195,7 +203,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         :param device_id: ID of integration Device in Home Assistant
         """
 
-        self.__api_key = api_key
+        self.__api_key = api_key.strip()
         self._lat = latitude
         self._lon = longitude
         self._device_id = device_id
@@ -227,10 +235,13 @@ class WeatherUpdater(DataUpdateCoordinator):
         for attribute in attributes:
             value = src.get(attribute.src, attribute.default)
 
-            if attribute.mapping is not None and value is not None:
-                value = map_state(
-                    src=str(value), is_day=is_day, mapping=attribute.mapping
-                )
+            if value is not None and attribute.mapping is not None:
+                if isinstance(attribute.mapping, dict):
+                    value = map_state(
+                        src=str(value), is_day=is_day, mapping=attribute.mapping
+                    )
+                else:
+                    value = attribute.mapping(value)
 
             if attribute.should_translate and value is not None:
                 value = translate_condition(value, self.translation)

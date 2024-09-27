@@ -29,6 +29,7 @@ from .const import (
     ATTR_API_TEMPERATURE,
     ATTR_API_SERVER_TIME,
     ATTR_API_WIND_BEARING,
+    ATTR_WIND_BEARING_DIRECTION,
     ATTR_API_WIND_SPEED,
     ATTR_API_WIND_GUST,
     ATTR_API_YA_CONDITION,
@@ -87,9 +88,16 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key=ATTR_API_WIND_BEARING,
         name="Wind bearing",
-        entity_registry_enabled_default=True,
+        entity_registry_enabled_default=False,
         icon="mdi:compass-rose",
         translation_key=ATTR_API_WIND_BEARING,
+    ),
+    SensorEntityDescription(
+        key=ATTR_WIND_BEARING_DIRECTION,
+        name="Wind bearing direction",
+        entity_registry_enabled_default=True,
+        icon="mdi:compass-rose",
+        translation_key=ATTR_WIND_BEARING_DIRECTION,
     ),
     SensorEntityDescription(
         key=ATTR_API_CONDITION,
