@@ -45,7 +45,7 @@
   "title": "Яндекс.Погода",
   "entity": {
     "sensor": {
-      "wind_dir": {
+      "wind_cardinal": {
         "state": {
           "N": "С",
           "NNE": "ССВ",

@@ -7,8 +7,7 @@ import uuid
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.const import (CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE,
-                                 CONF_NAME)
+from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
 from .const import CONF_LANGUAGE_KEY, DEFAULT_NAME, DOMAIN
@@ -50,13 +49,12 @@ class YandexWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             latitude = user_input[CONF_LATITUDE]
             longitude = user_input[CONF_LONGITUDE]
-
+            api_key = user_input[CONF_API_KEY].strip()
             await self.async_set_unique_id(f"{uuid.uuid4()}")
             self._abort_if_unique_id_configured()
 
-            if await _is_online(
-                user_input[CONF_API_KEY], latitude, longitude, self.hass
-            ):
+            if await _is_online(api_key, latitude, longitude, self.hass):
+                user_input[CONF_API_KEY] = api_key
                 return self.async_create_entry(
                     title=user_input[CONF_NAME], data=user_input
                 )
@@ -93,12 +91,14 @@ class YandexWeatherOptionsFlow(config_entries.OptionsFlow):
         """Manage the options."""
         errors = {}
         if user_input is not None:
+            api_key = user_input[CONF_API_KEY].strip()
             if await _is_online(
-                user_input[CONF_API_KEY],
+                api_key,
                 user_input[CONF_LATITUDE],
                 user_input[CONF_LONGITUDE],
                 self.hass,
             ):
+                user_input[CONF_API_KEY] = api_key
                 return self.async_create_entry(title="", data=user_input)
 
             errors["base"] = "could_not_get_data"

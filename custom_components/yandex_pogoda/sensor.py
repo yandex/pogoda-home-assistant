@@ -87,14 +87,14 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key=ATTR_API_WIND_BEARING,
-        name="Wind bearing",
+        name="Wind angle",
         entity_registry_enabled_default=False,
         icon="mdi:compass-rose",
         translation_key=ATTR_API_WIND_BEARING,
     ),
     SensorEntityDescription(
         key=ATTR_WIND_BEARING_DIRECTION,
-        name="Wind bearing direction",
+        name="Wind cardinal",
         entity_registry_enabled_default=True,
         icon="mdi:compass-rose",
         translation_key=ATTR_WIND_BEARING_DIRECTION,
@@ -195,7 +195,7 @@ class YandexWeatherSensor(SensorEntity, CoordinatorEntity, RestoreEntity):
                     convert_unit_value(
                         UNIT_CONVERTOR_TYPE_MAP[self.entity_description.key],
                         float(state.state),
-                        state.attributes.get('unit_of_measurement')
+                        state.attributes.get("unit_of_measurement")
                         or self.unit_of_measurement,
                         self.native_unit_of_measurement,
                     )
