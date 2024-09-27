@@ -42,13 +42,15 @@ from .const import (
     ATTR_API_YA_CONDITION,
     ATTR_FORECAST_DATA,
     ATTR_MIN_FORECAST_TEMPERATURE,
-    ATTR_WIND_BEARING_DIRECTION,
+    ATTR_WIND_INTERCARDINAL_DIRECTION,
+    ATTR_WIND_SECONDARY_INTERCARDINAL_DIRECTION,
     DEFAULT_UPDATES_PER_DAY,
     CONDITION_ICONS,
     DOMAIN,
     MANUFACTURER,
     WEATHER_STATES_CONVERSION,
-    get_wind_direction,
+    get_wind_intercardinal_direction,
+    get_wind_secondary_intercardinal_direction,
     map_state,
 )
 
@@ -123,9 +125,13 @@ CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
     AttributeMapper(ATTR_API_WIND_BEARING),
     AttributeMapper(
         ATTR_API_WIND_BEARING,
-        ATTR_WIND_BEARING_DIRECTION,
-        mapping=get_wind_direction,
-        should_translate=True,
+        ATTR_WIND_INTERCARDINAL_DIRECTION,
+        mapping=get_wind_intercardinal_direction,
+    ),
+    AttributeMapper(
+        ATTR_API_WIND_BEARING,
+        ATTR_WIND_SECONDARY_INTERCARDINAL_DIRECTION,
+        mapping=get_wind_secondary_intercardinal_direction,
     ),
     AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION, should_translate=True),
     AttributeMapper(
