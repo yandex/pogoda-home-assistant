@@ -2,10 +2,7 @@
 
 import pytest
 
-from custom_components.yandex_pogoda.const import (
-    get_wind_intercardinal_direction,
-    get_wind_secondary_intercardinal_direction,
-)
+from custom_components.yandex_pogoda.const import get_wind_intercardinal_direction
 
 
 wind_angle = [
@@ -32,6 +29,7 @@ wind_angle = [
     1500,
 ]
 
+
 intercardinal_expected = [
     "N",
     "N",
@@ -56,42 +54,9 @@ intercardinal_expected = [
     "N",
 ]
 
-secondary_intercardinal_expected = [
-    "N",
-    "N",
-    "NNE",
-    "NE",
-    "NE",
-    "ENE",
-    "E",
-    "E",
-    "ESE",
-    "ESE",
-    "SE",
-    "SE",
-    "SSE",
-    "S",
-    "SSW",
-    "SW",
-    "W",
-    "WNW",
-    "NW",
-    "NNW",
-    "N",
-]
-
 
 @pytest.mark.parametrize("direction,expected", zip(wind_angle, intercardinal_expected))
 @pytest.mark.asyncio
 async def test_get_wind_intercardinal_direction(direction, expected):
     """Test get_wind_intercardinal_direction"""
     assert expected == get_wind_intercardinal_direction(direction)
-
-
-@pytest.mark.parametrize(
-    "direction,expected", zip(wind_angle, secondary_intercardinal_expected)
-)
-@pytest.mark.asyncio
-async def test_get_wind_intercardinal_direction(direction, expected):
-    """Test get_wind_intercardinal_direction"""
-    assert expected == get_wind_secondary_intercardinal_direction(direction)

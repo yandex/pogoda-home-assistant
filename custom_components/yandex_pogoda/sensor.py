@@ -30,7 +30,6 @@ from .const import (
     ATTR_API_SERVER_TIME,
     ATTR_API_WIND_BEARING,
     ATTR_WIND_INTERCARDINAL_DIRECTION,
-    ATTR_WIND_SECONDARY_INTERCARDINAL_DIRECTION,
     ATTR_API_WIND_SPEED,
     ATTR_API_WIND_GUST,
     ATTR_API_YA_CONDITION,
@@ -95,17 +94,10 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key=ATTR_WIND_INTERCARDINAL_DIRECTION,
-        name="Wind intercardinal",
+        name="Wind direction",
         entity_registry_enabled_default=True,
         icon="mdi:compass-rose",
         translation_key=ATTR_WIND_INTERCARDINAL_DIRECTION,
-    ),
-    SensorEntityDescription(
-        key=ATTR_WIND_SECONDARY_INTERCARDINAL_DIRECTION,
-        name="Wind secondary intercardinal",
-        entity_registry_enabled_default=False,
-        icon="mdi:compass-rose",
-        translation_key=ATTR_WIND_SECONDARY_INTERCARDINAL_DIRECTION,
     ),
     SensorEntityDescription(
         key=ATTR_API_CONDITION,
