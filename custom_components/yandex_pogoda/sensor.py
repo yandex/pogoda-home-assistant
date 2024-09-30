@@ -29,6 +29,7 @@ from .const import (
     ATTR_API_TEMPERATURE,
     ATTR_API_SERVER_TIME,
     ATTR_API_WIND_BEARING,
+    ATTR_WIND_INTERCARDINAL_DIRECTION,
     ATTR_API_WIND_SPEED,
     ATTR_API_WIND_GUST,
     ATTR_API_YA_CONDITION,
@@ -86,10 +87,17 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key=ATTR_API_WIND_BEARING,
-        name="Wind bearing",
-        entity_registry_enabled_default=True,
+        name="Wind angle",
+        entity_registry_enabled_default=False,
         icon="mdi:compass-rose",
         translation_key=ATTR_API_WIND_BEARING,
+    ),
+    SensorEntityDescription(
+        key=ATTR_WIND_INTERCARDINAL_DIRECTION,
+        name="Wind direction",
+        entity_registry_enabled_default=True,
+        icon="mdi:compass-rose",
+        translation_key=ATTR_WIND_INTERCARDINAL_DIRECTION,
     ),
     SensorEntityDescription(
         key=ATTR_API_CONDITION,
@@ -187,7 +195,7 @@ class YandexWeatherSensor(SensorEntity, CoordinatorEntity, RestoreEntity):
                     convert_unit_value(
                         UNIT_CONVERTOR_TYPE_MAP[self.entity_description.key],
                         float(state.state),
-                        state.attributes.get('unit_of_measurement')
+                        state.attributes.get("unit_of_measurement")
                         or self.unit_of_measurement,
                         self.native_unit_of_measurement,
                     )

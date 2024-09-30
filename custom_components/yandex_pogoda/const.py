@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from collections.abc import Callable
 
 from homeassistant.components.weather import (
@@ -10,6 +12,9 @@ from homeassistant.components.weather import (
     UNIT_CONVERSIONS,
 )
 from homeassistant.const import Platform
+
+
+_LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "yandex_pogoda"
 DEFAULT_NAME = "Yandex Pogoda"
@@ -25,6 +30,7 @@ ATTR_API_TEMPERATURE = "temperature"
 ATTR_API_FEELS_LIKE_TEMPERATURE = "feelsLike"
 ATTR_API_WIND_SPEED = "windSpeed"
 ATTR_API_WIND_BEARING = "windAngle"
+ATTR_WIND_INTERCARDINAL_DIRECTION = "wind_intercardinal"
 
 ATTR_API_DAYTIME = "daytime"
 ATTR_API_CONDITION = "condition"
@@ -127,3 +133,36 @@ def map_state(src: str, is_day: bool, mapping: dict | None = None) -> str:
         return result["day" if is_day else "night"]
 
     return result
+
+
+def get_wind_intercardinal_direction(wind_direction_degree: int) -> str:
+    """Convert wind direction degree to named direction."""
+
+    if wind_direction_degree < 0 or wind_direction_degree > 360:
+        _LOGGER.error("Angle should be in [0, 360] range")
+
+    if wind_direction_degree <= 22.5:
+        return "N"
+
+    if wind_direction_degree <= 67.5:
+        return "NE"
+
+    if wind_direction_degree <= 112.5:
+        return "E"
+
+    if wind_direction_degree <= 157.5:
+        return "SE"
+
+    if wind_direction_degree <= 202.5:
+        return "S"
+
+    if wind_direction_degree <= 247.5:
+        return "SW"
+
+    if wind_direction_degree <= 292.5:
+        return "W"
+
+    if wind_direction_degree <= 337.5:
+        return "NW"
+
+    return "N"

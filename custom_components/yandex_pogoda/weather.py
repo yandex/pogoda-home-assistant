@@ -195,7 +195,6 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             ATTR_API_FORECAST_ICONS: self.coordinator.data.get(ATTR_API_FORECAST_ICONS),
             ATTR_FORECAST_DATA: self.__forecast_hourly(),
         }
-        # self.coordinator.async_refresh()
         self.async_write_ha_state()
 
     def update_condition_and_fire_event(self, new_condition: str):

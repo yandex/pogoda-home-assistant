@@ -45,6 +45,18 @@
   "title": "Яндекс.Погода",
   "entity": {
     "sensor": {
+      "wind_intercardinal": {
+        "state": {
+          "NE": "СВ",
+          "E": "В",
+          "SE": "ЮВ",
+          "S": "Ю",
+          "SW": "ЮЗ",
+          "W": "З",
+          "NW": "СЗ",
+          "N": "С"
+        }
+      },
       "yandex_condition": {
         "state": {
           "clear": "Ясно",
