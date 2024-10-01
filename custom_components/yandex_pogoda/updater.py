@@ -111,7 +111,6 @@ class AttributeMapper:
     _dst: str | None = None
     mapping: dict | None = None
     default: str | float | None = None
-    should_translate: bool = False
 
     @property
     def dst(self) -> str:
@@ -126,7 +125,7 @@ CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
         ATTR_WIND_INTERCARDINAL_DIRECTION,
         mapping=get_wind_intercardinal_direction,
     ),
-    AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION, should_translate=True),
+    AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION),
     AttributeMapper(
         ATTR_API_CONDITION, f"{ATTR_API_YA_CONDITION}_icon", CONDITION_ICONS
     ),
@@ -156,27 +155,6 @@ FORECAST_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-def read_translation_file(language: str) -> dict:
-    """Read parse and return translation file for language."""
-    try:
-        with open(f"{BASE_DIR}/translations/{language.lower()}.json") as f:
-            return json.loads(f.read())
-    except FileNotFoundError:
-        _LOGGER.debug(f"We have no translation for {language=} in {BASE_DIR}")
-
-    return {}
-
-
-def translate_condition(value: str, translation: dict) -> str:
-    """Translate Yandex condition."""
-    try:
-        return translation["entity"]["sensor"][ATTR_API_YA_CONDITION]["state"][value]
-    except KeyError:
-        _LOGGER.debug(f"Have no translation for {value}")
-
-    return value
-
-
 class WeatherUpdater(DataUpdateCoordinator):
     """Weather data updater for interaction with Yandex.Weather API."""
 
@@ -187,7 +165,6 @@ class WeatherUpdater(DataUpdateCoordinator):
         api_key: str,
         hass: HomeAssistant,
         device_id: str,
-        translation: dict,
         name="Yandex Weather",
         updates_per_day: int = DEFAULT_UPDATES_PER_DAY,
     ):
@@ -207,7 +184,6 @@ class WeatherUpdater(DataUpdateCoordinator):
         self._lon = longitude
         self._device_id = device_id
         self._name = name
-        self.translation = translation
 
         self.update_interval = timedelta(
             seconds=math.ceil((24 * 60 * 60) / updates_per_day)
@@ -241,9 +217,6 @@ class WeatherUpdater(DataUpdateCoordinator):
                     )
                 else:
                     value = attribute.mapping(value)
-
-            if attribute.should_translate and value is not None:
-                value = translate_condition(value, self.translation)
 
             dst[attribute.dst] = value
 

@@ -44,7 +44,6 @@ ATTR_API_FORECAST_ICONS = "forecast_icons"
 
 ATTR_FORECAST_DATA = "forecast"
 
-CONF_LANGUAGE_KEY = "language"
 UPDATE_LISTENER = "update_listener"
 PLATFORMS = [Platform.SENSOR, Platform.WEATHER]
 
