@@ -1,6 +1,4 @@
 {
   "name": "Yandex Pogoda",
-  "homeassistant":  "2024.2.0",
-  "zip_release": true,
-  "filename": "yandex_pogoda.zip"
+  "homeassistant":  "2024.2.0"
 }
