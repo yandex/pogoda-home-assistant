@@ -47,22 +47,22 @@
     "sensor": {
       "yandex_condition": {
         "state": {
-          "CLEAR": "Clear",
-          "PARTLY_CLOUDY": "Partly cloudy",
-          "CLOUDY": "Cloudy",
-          "OVERCAST":  "Overcast",
-          "LIGHT_RAIN": "Light rain",
-          "RAIN": "Rain",
-          "HEAVY_RAIN": "Heavy rain",
-          "SHOWERS": "Showers",
-          "SLEET": "Sleet",
-          "LIGHT_SNOW": "Light snow",
-          "SNOW": "Snow",
-          "SNOWFALL": "Snowfall",
-          "HAIL": "Hail",
-          "THUNDERSTORM": "Thunderstorm",
-          "THUNDERSTORM_WITH_RAIN": "Thunderstorm with rain",
-          "THUNDERSTORM_WITH_HAIL": "Thunderstorm with hail"
+          "CLEAR": "clear",
+          "PARTLY_CLOUDY": "partly cloudy",
+          "CLOUDY": "cloudy",
+          "OVERCAST":  "overcast",
+          "LIGHT_RAIN": "light rain",
+          "RAIN": "rain",
+          "HEAVY_RAIN": "heavy rain",
+          "SHOWERS": "showers",
+          "SLEET": "sleet",
+          "LIGHT_SNOW": "light snow",
+          "SNOW": "snow",
+          "SNOWFALL": "snowfall",
+          "HAIL": "hail",
+          "THUNDERSTORM": "thunderstorm",
+          "THUNDERSTORM_WITH_RAIN": "thunderstorm with rain",
+          "THUNDERSTORM_WITH_HAIL": "thunderstorm with hail"
         }
       }
     }
