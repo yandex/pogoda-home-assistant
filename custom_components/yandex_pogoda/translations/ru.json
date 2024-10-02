@@ -47,37 +47,34 @@
     "sensor": {
       "wind_intercardinal": {
         "state": {
-          "NE": "СВ",
-          "E": "В",
-          "SE": "ЮВ",
-          "S": "Ю",
-          "SW": "ЮЗ",
-          "W": "З",
-          "NW": "СЗ",
-          "N": "С"
+          "ne": "СВ",
+          "e": "В",
+          "se": "ЮВ",
+          "s": "Ю",
+          "sw": "ЮЗ",
+          "w": "З",
+          "nw": "СЗ",
+          "n": "С"
         }
       },
       "yandex_condition": {
         "state": {
           "clear": "Ясно",
-          "partlycloudy": "Малооблачно",
+          "partly_cloudy": "Малооблачно",
           "cloudy": "Облачно с прояснениями",
-          "overcast": "Пасмурно",
-          "drizzle": "Морось",
-          "light-rain": "Небольшой дождь",
+          "overcast":  "Пасмурно",
+          "light_rain": "Слабый дождь",
           "rain": "Дождь",
-          "moderate-rain": "Умеренно сильный дождь",
-          "heavy-rain": "Сильный дождь",
-          "continuous-heavy-rain": "Длительный сильный дождь",
+          "heavy_rain": "Сильный дождь",
           "showers": "Ливень",
-          "wet-snow": "Дождь со снегом",
-          "light-snow": "Небольшой снег",
+          "sleet": "Снег с дождём",
+          "light_snow": "Слабый снег",
           "snow": "Снег",
-          "snow-showers": "Снегопад",
+          "snowfall": "Снегопад",
           "hail": "Град",
           "thunderstorm": "Гроза",
-          "thunderstorm-with-rain": "Дождь с грозой",
-          "thunderstorm-with-hail": "Гроза с градом"
+          "thunderstorm_with_rain": "Дождь с грозой",
+          "thunderstorm_with_hail": "Гроза с градом"
         }
       },
       "condition": {

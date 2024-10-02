@@ -42,5 +42,41 @@
       }
     }
   },
-  "title": "Yandex Pogoda"
+  "title": "Yandex Pogoda",
+  "entity": {
+    "sensor": {
+      "wind_intercardinal": {
+        "state": {
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SW",
+          "w": "W",
+          "nw": "NW",
+          "n": "N"
+        }
+      },
+      "yandex_condition": {
+        "state": {
+          "clear": "Clear",
+          "partly_cloudy": "Partly cloudy",
+          "cloudy": "Cloudy",
+          "overcast":  "Overcast",
+          "light_rain": "Light rain",
+          "rain": "Rain",
+          "heavy_rain": "Heavy rain",
+          "showers": "Showers",
+          "sleet": "Sleet",
+          "light_snow": "Light snow",
+          "snow": "Snow",
+          "snowfall": "Snowfall",
+          "hail": "Hail",
+          "thunderstorm": "Thunderstorm",
+          "thunderstorm_with_rain": "Thunderstorm with rain",
+          "thunderstorm_with_hail": "Thunderstorm with hail"
+        }
+      }
+    }
+  }
 }

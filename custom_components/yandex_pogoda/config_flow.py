@@ -10,13 +10,8 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
-from .const import CONF_LANGUAGE_KEY, DEFAULT_NAME, DOMAIN
-from .updater import WeatherUpdater, read_translation_file
-
-
-def get_supported_languages() -> list[str]:
-    """Get supported translations."""
-    return ["EN", "RU"]
+from .const import DEFAULT_NAME, DOMAIN
+from .updater import WeatherUpdater
 
 
 def get_value(config_entry: config_entries | None, param: str, default=None):
@@ -71,9 +66,6 @@ class YandexWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(
                     CONF_LONGITUDE, default=self.hass.config.longitude
                 ): cv.longitude,
-                vol.Required(
-                    CONF_LANGUAGE_KEY, default=get_supported_languages()[0]
-                ): vol.In(get_supported_languages()),
             }
         )
 
@@ -119,17 +111,11 @@ class YandexWeatherOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(
                     CONF_LONGITUDE, default=get_value(self.config_entry, CONF_LONGITUDE)
                 ): cv.longitude,
-                vol.Required(
-                    CONF_LANGUAGE_KEY,
-                    default=get_value(self.config_entry, CONF_LANGUAGE_KEY),
-                ): vol.In(get_supported_languages()),
             }
         )
 
 
 async def _is_online(api_key, lat, lon, hass: HomeAssistant) -> bool:
-    language = get_supported_languages()[0]
-    translation = await hass.async_add_executor_job(read_translation_file, language)
-    weather = WeatherUpdater(lat, lon, api_key, hass, f"{uuid.uuid4()}", translation)
+    weather = WeatherUpdater(lat, lon, api_key, hass, f"{uuid.uuid4()}")
     await weather.async_request_refresh()
     return weather.last_update_success

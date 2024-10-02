@@ -37,9 +37,11 @@ from .const import (
     ATTRIBUTION,
     DOMAIN,
     ENTRY_NAME,
+    HA_WEATHER_STATES,
     TEMPERATURE_CONVERTER,
     UPDATER,
     WIND_SPEED_CONVERTER,
+    YA_CONDITION_STATES,
     convert_unit_value,
 )
 from .updater import WeatherUpdater
@@ -104,6 +106,8 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Condition HomeAssistant",
         entity_registry_enabled_default=False,
         translation_key=ATTR_API_CONDITION,
+        options=HA_WEATHER_STATES,
+        device_class=SensorDeviceClass.ENUM,
     ),
     SensorEntityDescription(
         key=ATTR_API_SERVER_TIME,
@@ -118,6 +122,8 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
         name="Condition Yandex",
         entity_registry_enabled_default=True,
         translation_key=ATTR_API_YA_CONDITION,
+        options=YA_CONDITION_STATES,
+        device_class=SensorDeviceClass.ENUM,
     ),
     SensorEntityDescription(
         key=ATTR_MIN_FORECAST_TEMPERATURE,

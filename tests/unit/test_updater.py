@@ -4,13 +4,13 @@ import pytest
 from homeassistant.components.weather import ATTR_FORECAST_NATIVE_TEMP
 
 from custom_components.yandex_pogoda.const import ATTR_MIN_FORECAST_TEMPERATURE
-from custom_components.yandex_pogoda.updater import (WeatherUpdater,
-                                                     read_translation_file)
+from custom_components.yandex_pogoda.updater import WeatherUpdater
+
 
 scenarios = {
     "test_data.json": [
         ("condition", "sunny"),
-        ("yandex_condition", "CLEAR"),
+        ("yandex_condition", "clear"),
         ("feelsLike", 36),
         ("icon", "png.png"),
         ("temperature", 31),
@@ -57,8 +57,7 @@ def pytest_generate_tests(metafunc):
 @pytest.mark.asyncio
 async def test_update(hass, key, value, _bypass_get_data):
     """Test update action."""
-    translation = read_translation_file("EN")
-    w = WeatherUpdater(0, 0, "", hass, "test_device", translation)
+    w = WeatherUpdater(0, 0, "", hass, "test_device")
     result = await w.update()
     assert result[key] == value
 

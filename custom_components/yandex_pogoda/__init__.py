@@ -8,14 +8,13 @@ from homeassistant.core import HomeAssistant
 
 from .config_flow import get_value
 from .const import (
-    CONF_LANGUAGE_KEY,
     DOMAIN,
     ENTRY_NAME,
     PLATFORMS,
     UPDATE_LISTENER,
     UPDATER,
 )
-from .updater import WeatherUpdater, read_translation_file
+from .updater import WeatherUpdater
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -24,8 +23,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api_key = get_value(entry, CONF_API_KEY)
     latitude = get_value(entry, CONF_LATITUDE, hass.config.latitude)
     longitude = get_value(entry, CONF_LONGITUDE, hass.config.longitude)
-    language = get_value(entry, CONF_LANGUAGE_KEY, "EN")
-    translation = await hass.async_add_executor_job(read_translation_file, language)
 
     weather_updater = WeatherUpdater(
         latitude=latitude,
@@ -34,7 +31,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass=hass,
         device_id=entry.unique_id,
         name=name,
-        translation=translation,
     )
 
     hass.data.setdefault(DOMAIN, {})
