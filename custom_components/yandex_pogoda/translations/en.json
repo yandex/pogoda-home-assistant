@@ -45,24 +45,36 @@
   "title": "Yandex Pogoda",
   "entity": {
     "sensor": {
+      "wind_intercardinal": {
+        "state": {
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SW",
+          "w": "W",
+          "nw": "NW",
+          "n": "N"
+        }
+      },
       "yandex_condition": {
         "state": {
-          "CLEAR": "clear",
-          "PARTLY_CLOUDY": "partly cloudy",
-          "CLOUDY": "cloudy",
-          "OVERCAST":  "overcast",
-          "LIGHT_RAIN": "light rain",
-          "RAIN": "rain",
-          "HEAVY_RAIN": "heavy rain",
-          "SHOWERS": "showers",
-          "SLEET": "sleet",
-          "LIGHT_SNOW": "light snow",
-          "SNOW": "snow",
-          "SNOWFALL": "snowfall",
-          "HAIL": "hail",
-          "THUNDERSTORM": "thunderstorm",
-          "THUNDERSTORM_WITH_RAIN": "thunderstorm with rain",
-          "THUNDERSTORM_WITH_HAIL": "thunderstorm with hail"
+          "clear": "Clear",
+          "partly_cloudy": "Partly cloudy",
+          "cloudy": "Cloudy",
+          "overcast":  "Overcast",
+          "light_rain": "Light rain",
+          "rain": "Rain",
+          "heavy_rain": "Heavy rain",
+          "showers": "Showers",
+          "sleet": "Sleet",
+          "light_snow": "Light snow",
+          "snow": "Snow",
+          "snowfall": "Snowfall",
+          "hail": "Hail",
+          "thunderstorm": "Thunderstorm",
+          "thunderstorm_with_rain": "Thunderstorm with rain",
+          "thunderstorm_with_hail": "Thunderstorm with hail"
         }
       }
     }

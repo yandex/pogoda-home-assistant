@@ -47,6 +47,27 @@ ATTR_FORECAST_DATA = "forecast"
 UPDATE_LISTENER = "update_listener"
 PLATFORMS = [Platform.SENSOR, Platform.WEATHER]
 
+YA_CONDITIONS = [
+    "CLEAR",
+    "PARTLY_CLOUDY",
+    "CLOUDY",
+    "OVERCAST",
+    "LIGHT_RAIN",
+    "RAIN",
+    "HEAVY_RAIN",
+    "SHOWERS",
+    "SLEET",
+    "LIGHT_SNOW",
+    "SNOW",
+    "SNOWFALL",
+    "HAIL",
+    "THUNDERSTORM",
+    "THUNDERSTORM_WITH_RAIN",
+    "THUNDERSTORM_WITH_HAIL",
+]
+YA_CONDITION_STATE_MAP = {i: i.lower() for i in YA_CONDITIONS}
+"""Mapping for yandex states"""
+
 WEATHER_STATES_CONVERSION = {
     "CLEAR": {
         "day": "sunny",
@@ -96,6 +117,7 @@ CONDITION_ICONS = {
 }
 """Mapping for state icon"""
 
+
 TEMPERATURE_CONVERTER = UNIT_CONVERSIONS[ATTR_WEATHER_TEMPERATURE_UNIT]
 WIND_SPEED_CONVERTER = UNIT_CONVERSIONS[ATTR_WEATHER_WIND_SPEED_UNIT]
 
@@ -141,27 +163,27 @@ def get_wind_intercardinal_direction(wind_direction_degree: int) -> str:
         _LOGGER.error("Angle should be in [0, 360] range")
 
     if wind_direction_degree <= 22.5:
-        return "N"
+        return "n"
 
     if wind_direction_degree <= 67.5:
-        return "NE"
+        return "ne"
 
     if wind_direction_degree <= 112.5:
-        return "E"
+        return "e"
 
     if wind_direction_degree <= 157.5:
-        return "SE"
+        return "se"
 
     if wind_direction_degree <= 202.5:
-        return "S"
+        return "s"
 
     if wind_direction_degree <= 247.5:
-        return "SW"
+        return "sw"
 
     if wind_direction_degree <= 292.5:
-        return "W"
+        return "w"
 
     if wind_direction_degree <= 337.5:
-        return "NW"
+        return "nw"
 
-    return "N"
+    return "n"

@@ -48,6 +48,7 @@ from .const import (
     DOMAIN,
     MANUFACTURER,
     WEATHER_STATES_CONVERSION,
+    YA_CONDITION_STATE_MAP,
     get_wind_intercardinal_direction,
     map_state,
 )
@@ -125,7 +126,7 @@ CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
         ATTR_WIND_INTERCARDINAL_DIRECTION,
         mapping=get_wind_intercardinal_direction,
     ),
-    AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION),
+    AttributeMapper(ATTR_API_CONDITION, ATTR_API_YA_CONDITION, YA_CONDITION_STATE_MAP),
     AttributeMapper(
         ATTR_API_CONDITION, f"{ATTR_API_YA_CONDITION}_icon", CONDITION_ICONS
     ),

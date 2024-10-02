@@ -10,7 +10,7 @@ from custom_components.yandex_pogoda.updater import WeatherUpdater
 scenarios = {
     "test_data.json": [
         ("condition", "sunny"),
-        ("yandex_condition", "CLEAR"),
+        ("yandex_condition", "clear"),
         ("feelsLike", 36),
         ("icon", "png.png"),
         ("temperature", 31),
