@@ -68,6 +68,8 @@ YA_CONDITIONS = [
 YA_CONDITION_STATE_MAP = {i: i.lower() for i in YA_CONDITIONS}
 """Mapping for yandex states"""
 
+YA_CONDITION_STATES = list(YA_CONDITION_STATE_MAP.values())
+
 WEATHER_STATES_CONVERSION = {
     "CLEAR": {
         "day": "sunny",
@@ -90,6 +92,10 @@ WEATHER_STATES_CONVERSION = {
     "THUNDERSTORM_WITH_HAIL": "lightning-rainy",
 }
 """Map rich Yandex weather condition to ordinary HA"""
+
+HA_WEATHER_STATES = [
+    i for i in WEATHER_STATES_CONVERSION.values() if isinstance(i, str)
+] + list(WEATHER_STATES_CONVERSION["CLEAR"].values())
 
 CONDITION_ICONS = {
     "CLEAR": {
