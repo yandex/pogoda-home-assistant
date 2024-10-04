@@ -137,24 +137,17 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
                 state.attributes.get("wind_speed")
             )
             self._attr_native_wind_gust_speed = ws_converter(
-                state.attributes.get("windGust")
+                state.attributes.get("wind_gust_speed")
             )
             self._attr_native_apparent_temperature = temp_converter(
-                state.attributes.get("feelsLike")
+                state.attributes.get("apparent_temperature")
             )
             self._attr_wind_bearing = state.attributes.get("wind_bearing")
             self._attr_entity_picture = state.attributes.get("entity_picture")
             self._hourly_forecast = state.attributes.get(ATTR_FORECAST_DATA, [])
 
-            self._attr_extra_state_attributes = {
-                ATTR_FORECAST_DATA: self._hourly_forecast,
-            }
-            for attribute in [
-                ATTR_API_FEELS_LIKE_TEMPERATURE,
-                ATTR_API_WIND_GUST,
-                "yandex_condition",
-                "forecast_icons",
-            ]:
+            self._attr_extra_state_attributes = {}
+            for attribute in [ATTR_API_YA_CONDITION, ATTR_API_FORECAST_ICONS]:
                 value = state.attributes.get(attribute)
                 if value is not None:
                     self._attr_extra_state_attributes[attribute] = value
@@ -185,15 +178,16 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
         self._attr_native_temperature = self.coordinator.data.get(ATTR_API_TEMPERATURE)
         self._attr_native_wind_speed = self.coordinator.data.get(ATTR_API_WIND_SPEED)
         self._attr_wind_bearing = self.coordinator.data.get(ATTR_API_WIND_BEARING)
+        self._attr_native_wind_gust_speed = self.coordinator.data.get(
+            ATTR_API_WIND_GUST
+        )
+        self._attr_native_apparent_temperature = self.coordinator.data.get(
+            ATTR_API_FEELS_LIKE_TEMPERATURE
+        )
         _LOGGER.debug(f"_handle_coordinator_update: {self._hourly_forecast=}")
         self._attr_extra_state_attributes = {
-            ATTR_API_FEELS_LIKE_TEMPERATURE: self.coordinator.data.get(
-                ATTR_API_FEELS_LIKE_TEMPERATURE
-            ),
-            ATTR_API_WIND_GUST: self.coordinator.data.get(ATTR_API_WIND_GUST),
             ATTR_API_YA_CONDITION: self.coordinator.data.get(ATTR_API_YA_CONDITION),
             ATTR_API_FORECAST_ICONS: self.coordinator.data.get(ATTR_API_FORECAST_ICONS),
-            ATTR_FORECAST_DATA: self.__forecast_hourly(),
         }
         self.async_write_ha_state()
 
