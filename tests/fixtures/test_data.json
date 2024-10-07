@@ -16,26 +16,39 @@
         "days": [
           {
             "time": "2024-09-06T00:00:00+03:00",
-            "parts": {
+            "sunriseBeginTime": "2024-10-07T05:37:00+01:00",
+            "sunsetEndTime": "2024-10-07T18:05:00+01:00",
+            "hours": [
+              {
+                "time": "2024-10-07T00:00:00+01:00",
+                "condition": "CLOUDY",
+                "feelsLike": 26,
+                "icon": "https://yastatic.net/weather/i/icons/funky/png/dark/64/bkn_n.png",
+                "temperature": 24,
+                "windAngle": 112,
+                "windGust": 2.9,
+                "windSpeed": 1.6
+              },
+              {
+                "time": "2024-10-07T01:00:00+01:00",
+                "condition": "CLOUDY",
+                "feelsLike": 26,
+                "icon": "https://yastatic.net/weather/i/icons/funky/png/dark/64/bkn_n.png",
+                "temperature": 24,
+                "windAngle": 142,
+                "windGust": 2.4,
+                "windSpeed": 1.8
+              }
+            ],
+            "summary": {
               "night": {
                 "condition": "PARTLY_CLOUDY",
-                "daytime": "NIGHT",
                 "feelsLike": 31,
                 "icon": "png.png",
                 "temperature": 30,
                 "windAngle": 225,
                 "windGust": 9.3,
                 "windSpeed": 8.3
-              },
-              "morning": {
-                "condition": "PARTLY_CLOUDY",
-                "daytime": "DAY",
-                "feelsLike": 31,
-                "icon": "png.png",
-                "temperature": 30,
-                "windAngle": 225,
-                "windGust": 10.6,
-                "windSpeed": 9.6
               },
               "day": {
                 "condition": "CLOUDY",
@@ -46,22 +59,36 @@
                 "windAngle": 225,
                 "windGust": 9.1,
                 "windSpeed": 8
-              },
-              "evening": {
-                "condition": "CLOUDY",
-                "daytime": "NIGHT",
-                "feelsLike": 33,
-                "icon": "png.png",
-                "temperature": 30,
-                "windAngle": 225,
-                "windGust": 6.3,
-                "windSpeed": 5.5
               }
             }
           },
           {
             "time": "2024-09-07T00:00:00+03:00",
-            "parts": {
+            "sunriseBeginTime": "2024-10-08T05:38:00+01:00",
+            "sunsetEndTime": "2024-10-08T18:04:00+01:00",
+            "hours": [
+              {
+                "time": "2024-10-08T00:00:00+01:00",
+                "condition": "CLEAR",
+                "feelsLike": 24,
+                "icon": "https://yastatic.net/weather/i/icons/funky/png/dark/64/skc_n.png",
+                "temperature": 25,
+                "windAngle": 126,
+                "windGust": 11,
+                "windSpeed": 7
+              },
+              {
+                "time": "2024-10-08T01:00:00+01:00",
+                "condition": "CLEAR",
+                "feelsLike": 24,
+                "icon": "https://yastatic.net/weather/i/icons/funky/png/dark/64/skc_n.png",
+                "temperature": 25,
+                "windAngle": 130,
+                "windGust": 10.6,
+                "windSpeed": 7
+              }
+            ],
+            "summary": {
               "night": {
                 "condition": "CLOUDY",
                 "daytime": "NIGHT",
@@ -72,16 +99,6 @@
                 "windGust": 12.8,
                 "windSpeed": 11.8
               },
-              "morning": {
-                "condition": "PARTLY_CLOUDY",
-                "daytime": "DAY",
-                "feelsLike": 31,
-                "icon": "png.png",
-                "temperature": 25,
-                "windAngle": 225,
-                "windGust": 12.1,
-                "windSpeed": 11.1
-              },
               "day": {
                 "condition": "PARTLY_CLOUDY",
                 "daytime": "DAY",
@@ -91,16 +108,6 @@
                 "windAngle": 225,
                 "windGust": 11,
                 "windSpeed": 10.1
-              },
-              "evening": {
-                "condition": "PARTLY_CLOUDY",
-                "daytime": "NIGHT",
-                "feelsLike": 32,
-                "icon": "png.png",
-                "temperature": 30,
-                "windAngle": 225,
-                "windGust": 8.3,
-                "windSpeed": 7.8
               }
             }
           }
