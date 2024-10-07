@@ -6,7 +6,6 @@ import aiohttp
 import json
 import logging
 import math
-import os
 
 from dataclasses import dataclass
 from datetime import timedelta
@@ -79,7 +78,7 @@ API_QUERY_TEMPLATE = f"""{{
             {ATTR_API_WIND_SPEED}
         }}
         forecast {{
-            days(limit: 4){{
+            days(limit: 3){{
                 {ATTR_API_TIME}
                 {ATTR_API_SUNRISE_BEGIN_TIME}
                 {ATTR_API_SUNRISE_END_TIME}
@@ -265,7 +264,7 @@ class WeatherUpdater(DataUpdateCoordinator):
     async def _get_weather_data(self):
         if self.is_first_update_requred:  # No need to make API request
             self.is_first_update_requred = False
-            _LOGGER.error("Skip API request")
+            _LOGGER.info("Skip API request")
             return self.weather_data
 
         timeout = aiohttp.ClientTimeout(total=20)
@@ -358,7 +357,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         :returns: dict with response data
         :raises AssertionError: when response.status is not 200
         """
-        _LOGGER.error("Sending API request")
+        _LOGGER.info("Sending API request")
         async with session.post(
             API_URL,
             headers={API_HEADER_NAME: api_key},

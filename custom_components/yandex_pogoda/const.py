@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import logging
+import pickle
+import zlib
 
 from collections.abc import Callable
 
@@ -41,6 +44,7 @@ ATTR_API_YA_CONDITION = "yandex_condition"
 ATTR_API_WIND_GUST = "windGust"
 
 ATTR_FORECAST_DATA = "forecast"
+ATTR_FORECAST_DATA_COMPRESSED = "forecast_compressed"
 ATTR_FORECAST_HOURLY = "hourly"
 ATTR_FORECAST_HOURLY_ICONS = "forecast_hourly_icons"
 ATTR_FORECAST_TWICE_DAILY = "twice_daily"
@@ -198,3 +202,19 @@ def get_wind_intercardinal_direction(wind_direction_degree: int) -> str:
         return "nw"
 
     return "n"
+
+
+def compress_data(data: dict) -> str:
+    """Compress dict to string."""
+    return base64.b64encode(zlib.compress(pickle.dumps(data))).decode("utf-8")
+
+
+def decompress_data(compressed: str | None) -> dict:
+    """Compress dict to string."""
+    if not compressed:
+        return {}
+
+    try:
+        return pickle.loads(zlib.decompress(base64.b64decode(compressed)))
+    except TypeError:  # for backward compatibility
+        return {}
