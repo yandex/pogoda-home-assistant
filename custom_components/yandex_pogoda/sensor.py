@@ -14,6 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    DEGREE,
     UnitOfSpeed,
     UnitOfTemperature,
 )
@@ -89,10 +90,11 @@ WEATHER_SENSORS: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key=ATTR_API_WIND_BEARING,
-        name="Wind angle",
+        name="Wind bearing",
         entity_registry_enabled_default=False,
         icon="mdi:compass-rose",
         translation_key=ATTR_API_WIND_BEARING,
+        native_unit_of_measurement=DEGREE,
     ),
     SensorEntityDescription(
         key=ATTR_WIND_INTERCARDINAL_DIRECTION,

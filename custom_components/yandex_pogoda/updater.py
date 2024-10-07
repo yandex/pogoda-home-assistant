@@ -6,7 +6,6 @@ import aiohttp
 import json
 import logging
 import math
-import os
 
 from dataclasses import dataclass
 from datetime import timedelta
@@ -16,6 +15,7 @@ from homeassistant.components.weather import (
     ATTR_FORECAST_CONDITION,
     ATTR_FORECAST_NATIVE_APPARENT_TEMP,
     ATTR_FORECAST_NATIVE_TEMP,
+    ATTR_FORECAST_NATIVE_TEMP_LOW,
     ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
     ATTR_FORECAST_NATIVE_WIND_SPEED,
     ATTR_FORECAST_WIND_BEARING,
@@ -27,20 +27,26 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
-    API_DAY_PARTS,
     ATTR_API_CONDITION,
     ATTR_API_DAYTIME,
     ATTR_API_FEELS_LIKE_TEMPERATURE,
-    ATTR_API_FORECAST_ICONS,
-    ATTR_API_TIME,
     ATTR_API_IMAGE,
-    ATTR_API_TEMPERATURE,
     ATTR_API_SERVER_TIME,
+    ATTR_API_SUNRISE_BEGIN_TIME,
+    ATTR_API_SUNRISE_END_TIME,
+    ATTR_API_TEMPERATURE,
+    ATTR_API_TEMPERATURE_MAX,
+    ATTR_API_TEMPERATURE_MIN,
+    ATTR_API_TIME,
     ATTR_API_WIND_BEARING,
     ATTR_API_WIND_GUST,
     ATTR_API_WIND_SPEED,
     ATTR_API_YA_CONDITION,
     ATTR_FORECAST_DATA,
+    ATTR_FORECAST_HOURLY,
+    ATTR_FORECAST_HOURLY_ICONS,
+    ATTR_FORECAST_TWICE_DAILY,
+    ATTR_FORECAST_TWICE_DAILY_ICONS,
     ATTR_MIN_FORECAST_TEMPERATURE,
     ATTR_WIND_INTERCARDINAL_DIRECTION,
     DEFAULT_UPDATES_PER_DAY,
@@ -57,7 +63,7 @@ _LOGGER = logging.getLogger(__name__)
 
 API_URL = "https://api.weather.yandex.ru/graphql/query"
 API_HEADER_NAME = "X-Yandex-Weather-Key"
-API_QUERY_FORECAST_DAYS_LIMIT = 2
+
 API_QUERY_TEMPLATE = f"""{{
     {ATTR_API_SERVER_TIME}
     weatherByPoint(request: {{ lat: %s, lon: %s }}) {{
@@ -72,19 +78,25 @@ API_QUERY_TEMPLATE = f"""{{
             {ATTR_API_WIND_SPEED}
         }}
         forecast {{
-            days(limit: %s){{
+            days(limit: 3){{
                 {ATTR_API_TIME}
-                parts{{
-                    {API_DAY_PARTS[0][0]}{{
+                {ATTR_API_SUNRISE_BEGIN_TIME}
+                {ATTR_API_SUNRISE_END_TIME}
+                hours{{
+                    {ATTR_API_TIME}
+                    {ATTR_API_CONDITION}
+                    {ATTR_API_FEELS_LIKE_TEMPERATURE}
+                    {ATTR_API_IMAGE}(format: PNG_64)
+                    {ATTR_API_TEMPERATURE}
+                    {ATTR_API_WIND_BEARING}
+                    {ATTR_API_WIND_GUST}
+                    {ATTR_API_WIND_SPEED}
+                }}
+                summary{{
+                    night{{
                         ...forecastFields
                     }}
-                    {API_DAY_PARTS[1][0]}{{
-                        ...forecastFields
-                    }}
-                    {API_DAY_PARTS[2][0]}{{
-                        ...forecastFields
-                    }}
-                    {API_DAY_PARTS[3][0]}{{
+                    day{{
                         ...forecastFields
                     }}
                 }}
@@ -94,13 +106,13 @@ API_QUERY_TEMPLATE = f"""{{
 }}
 fragment forecastFields on Daypart {{
     {ATTR_API_CONDITION}
-    {ATTR_API_DAYTIME}
     {ATTR_API_FEELS_LIKE_TEMPERATURE}
     {ATTR_API_IMAGE}(format: PNG_64)
-    {ATTR_API_TEMPERATURE}
     {ATTR_API_WIND_BEARING}
     {ATTR_API_WIND_GUST}
     {ATTR_API_WIND_SPEED}
+    {ATTR_API_TEMPERATURE_MAX}
+    {ATTR_API_TEMPERATURE_MIN}
 }}"""
 
 
@@ -139,7 +151,7 @@ CURRENT_WEATHER_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
 ]
 
 
-FORECAST_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
+FORECAST_HOUR_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
     AttributeMapper(ATTR_API_WIND_BEARING, ATTR_FORECAST_WIND_BEARING),
     AttributeMapper(ATTR_API_WIND_SPEED, ATTR_FORECAST_NATIVE_WIND_SPEED, default=0),
     AttributeMapper(
@@ -153,7 +165,19 @@ FORECAST_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
 ]
 
 
-BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+FORECAST_DAY_ATTRIBUTE_TRANSLATION: list[AttributeMapper] = [
+    AttributeMapper(ATTR_API_WIND_BEARING, ATTR_FORECAST_WIND_BEARING),
+    AttributeMapper(ATTR_API_WIND_SPEED, ATTR_FORECAST_NATIVE_WIND_SPEED, default=0),
+    AttributeMapper(
+        ATTR_API_FEELS_LIKE_TEMPERATURE, ATTR_FORECAST_NATIVE_APPARENT_TEMP
+    ),
+    AttributeMapper(ATTR_API_TEMPERATURE_MAX, ATTR_FORECAST_NATIVE_TEMP),
+    AttributeMapper(ATTR_API_TEMPERATURE_MIN, ATTR_FORECAST_NATIVE_TEMP_LOW),
+    AttributeMapper(
+        ATTR_API_CONDITION, ATTR_FORECAST_CONDITION, mapping=WEATHER_STATES_CONVERSION
+    ),
+    AttributeMapper(ATTR_API_WIND_GUST, ATTR_FORECAST_NATIVE_WIND_GUST_SPEED),
+]
 
 
 class WeatherUpdater(DataUpdateCoordinator):
@@ -168,6 +192,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         device_id: str,
         name="Yandex Weather",
         updates_per_day: int = DEFAULT_UPDATES_PER_DAY,
+        weather_data: dict | None = None,
     ):
         """Initialize updater.
 
@@ -178,6 +203,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         :param language: Language for yandex_condition
         :param updates_per_day: int: how many updates per day we should do?
         :param device_id: ID of integration Device in Home Assistant
+        :param weather_data: if not None then weather_data will be used for first update
         """
 
         self.__api_key = api_key.strip()
@@ -185,6 +211,8 @@ class WeatherUpdater(DataUpdateCoordinator):
         self._lon = longitude
         self._device_id = device_id
         self._name = name
+        self.weather_data = weather_data
+        self.is_first_update_requred = bool(weather_data)
 
         self.update_interval = timedelta(
             seconds=math.ceil((24 * 60 * 60) / updates_per_day)
@@ -233,24 +261,36 @@ class WeatherUpdater(DataUpdateCoordinator):
 
         return min(low_fc_temperatures) if len(low_fc_temperatures) > 0 else None
 
+    async def _get_weather_data(self):
+        if self.is_first_update_requred:  # No need to make API request
+            self.is_first_update_requred = False
+            _LOGGER.info("Skip API request")
+            return self.weather_data
+
+        timeout = aiohttp.ClientTimeout(total=20)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            rs = await self.request(session, self.__api_key, self._lat, self._lon)
+
+        self.weather_data = rs["data"]
+        return self.weather_data
+
     async def update(self):
         """Update weather information.
 
         :returns: dict with weather data.
         """
-        result = {}
-        timeout = aiohttp.ClientTimeout(total=20)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            rs = await self.request(session, self.__api_key, self._lat, self._lon)
-
-        data = rs["data"]
+        data = await self._get_weather_data()
         weather_by_point = data["weatherByPoint"]
         now = weather_by_point["now"]
         now_dt = parser.parse(data[ATTR_API_SERVER_TIME])
         result = {
             ATTR_API_SERVER_TIME: now_dt,
-            ATTR_API_FORECAST_ICONS: [],
-            ATTR_FORECAST_DATA: [],
+            ATTR_FORECAST_DATA: {
+                ATTR_FORECAST_HOURLY: [],
+                ATTR_FORECAST_TWICE_DAILY: [],
+            },
+            ATTR_FORECAST_HOURLY_ICONS: [],
+            ATTR_FORECAST_TWICE_DAILY_ICONS: [],
         }
         self.process_data(
             result,
@@ -260,31 +300,44 @@ class WeatherUpdater(DataUpdateCoordinator):
         )
 
         for day in weather_by_point["forecast"]["days"]:
-            day_parts = day["parts"]
-            day_dt = parser.parse(day[ATTR_API_TIME])
-
-            for part, hour in API_DAY_PARTS:
-                f_dt = day_dt.replace(hour=hour)
-
-                if now_dt > f_dt:
+            sunrise_begin = parser.parse(day[ATTR_API_SUNRISE_BEGIN_TIME])
+            sunset_end = parser.parse(day[ATTR_API_SUNRISE_END_TIME])
+            for hour in day["hours"]:
+                hour_dt = parser.parse(hour[ATTR_API_TIME])
+                if now_dt > hour_dt:
                     continue
 
-                if f := day_parts.get(part):
-                    forecast = Forecast(datetime=f_dt)
-                    self.process_data(
-                        forecast,
-                        f,
-                        FORECAST_ATTRIBUTE_TRANSLATION,
-                        f[ATTR_API_DAYTIME] == "DAY",
-                    )
-                    result[ATTR_FORECAST_DATA].append(forecast)
-                    result[ATTR_API_FORECAST_ICONS].append(
-                        f.get(ATTR_API_IMAGE, "no_image")
-                    )
+                hour_forecast = Forecast(datetime=hour_dt)
+                self.process_data(
+                    dst=hour_forecast,
+                    src=hour,
+                    attributes=FORECAST_HOUR_ATTRIBUTE_TRANSLATION,
+                    is_day=sunrise_begin <= hour_dt < sunset_end,
+                )
+                result[ATTR_FORECAST_DATA][ATTR_FORECAST_HOURLY].append(hour_forecast)
+                result[ATTR_FORECAST_HOURLY_ICONS].append(hour.get(ATTR_API_IMAGE))
+
+            day_dt = parser.parse(day[ATTR_API_TIME]) + timedelta(hours=2)
+            day_part = day["summary"]["day"]
+            night_part = day["summary"]["night"]
+            for part, is_day in ((night_part, False), (day_part, True)):
+                part_forecast = Forecast(datetime=day_dt, is_daytime=is_day)
+                self.process_data(
+                    dst=part_forecast,
+                    src=part,
+                    attributes=FORECAST_DAY_ATTRIBUTE_TRANSLATION,
+                    is_day=is_day,
+                )
+                result[ATTR_FORECAST_DATA][ATTR_FORECAST_TWICE_DAILY].append(
+                    part_forecast
+                )
+                result[ATTR_FORECAST_TWICE_DAILY_ICONS].append(part.get(ATTR_API_IMAGE))
+                day_dt = day_dt + timedelta(hours=12)
 
         result[ATTR_MIN_FORECAST_TEMPERATURE] = self.get_min_forecast_temperature(
-            result[ATTR_FORECAST_DATA]
+            result[ATTR_FORECAST_DATA][ATTR_FORECAST_HOURLY]
         )
+
         return result
 
     @staticmethod
@@ -308,9 +361,7 @@ class WeatherUpdater(DataUpdateCoordinator):
         async with session.post(
             API_URL,
             headers={API_HEADER_NAME: api_key},
-            json={
-                "query": API_QUERY_TEMPLATE % (lat, lon, API_QUERY_FORECAST_DAYS_LIMIT)
-            },
+            json={"query": API_QUERY_TEMPLATE % (lat, lon)},
         ) as response:
             try:
                 assert response.status == 200

@@ -26,7 +26,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import (
     ATTR_API_CONDITION,
     ATTR_API_FEELS_LIKE_TEMPERATURE,
-    ATTR_API_FORECAST_ICONS,
     ATTR_API_IMAGE,
     ATTR_API_TEMPERATURE,
     ATTR_API_WIND_BEARING,
@@ -34,13 +33,20 @@ from .const import (
     ATTR_API_WIND_SPEED,
     ATTR_API_YA_CONDITION,
     ATTR_FORECAST_DATA,
+    ATTR_FORECAST_DATA_COMPRESSED,
+    ATTR_FORECAST_HOURLY,
+    ATTR_FORECAST_HOURLY_ICONS,
+    ATTR_FORECAST_TWICE_DAILY,
+    ATTR_FORECAST_TWICE_DAILY_ICONS,
     ATTRIBUTION,
     DOMAIN,
     ENTRY_NAME,
     TEMPERATURE_CONVERTER,
     UPDATER,
     WIND_SPEED_CONVERTER,
+    compress_data,
     convert_unit_value,
+    decompress_data,
 )
 from .device_trigger import TRIGGERS
 from .updater import WeatherUpdater
@@ -51,7 +57,7 @@ _LOGGER = logging.getLogger(__name__)
 def _get_converter(
     converter: Callable[[float, str, str], float], unit_from: str, unit_to: str
 ) -> Callable[[float], float | None]:
-    def wrap(value: float) -> float | None:
+    def wrap(value: float | None) -> float | None:
         return convert_unit_value(converter, value, unit_from, unit_to)
 
     return wrap
@@ -77,6 +83,10 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
     _attr_native_wind_speed_unit = UnitOfSpeed.METERS_PER_SECOND
     _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _hourly_forecast: list[Forecast] | None
+    _twice_daily_forecast: list[Forecast] | None
+    _attr_supported_features = (
+        WeatherEntityFeature.FORECAST_HOURLY | WeatherEntityFeature.FORECAST_TWICE_DAILY
+    )
 
     coordinator: WeatherUpdater
 
@@ -96,8 +106,9 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
         self._attr_name = name
         self._attr_condition = None
         self._attr_unique_id = config_entry.unique_id
+        self._hourly_forecast = []
+        self._twice_daily_forecast = []
         self._attr_device_info = self.coordinator.device_info
-        self._attr_supported_features = WeatherEntityFeature.FORECAST_HOURLY
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to hass."""
@@ -144,13 +155,18 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             )
             self._attr_wind_bearing = state.attributes.get("wind_bearing")
             self._attr_entity_picture = state.attributes.get("entity_picture")
-            self._hourly_forecast = state.attributes.get(ATTR_FORECAST_DATA, [])
 
             self._attr_extra_state_attributes = {}
-            for attribute in [ATTR_API_YA_CONDITION, ATTR_API_FORECAST_ICONS]:
-                value = state.attributes.get(attribute)
-                if value is not None:
-                    self._attr_extra_state_attributes[attribute] = value
+            self._update_forecast_data(
+                decompress_data(state.attributes.get(ATTR_FORECAST_DATA_COMPRESSED))
+            )
+            for attr in (
+                ATTR_API_YA_CONDITION,
+                ATTR_FORECAST_HOURLY_ICONS,
+                ATTR_FORECAST_TWICE_DAILY_ICONS,
+            ):
+                if value := state.attributes.get(attr):
+                    self._attr_extra_state_attributes[attr] = value
 
             # last_updated is last call of self.async_write_ha_state(), not a real last update
             since_last_update = datetime.now(timezone.utc) - state.last_updated.replace(
@@ -168,13 +184,21 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
                 )
         self.async_write_ha_state()
 
+    def _update_forecast_data(self, forecast_data: dict):  # uncompressed
+        self._hourly_forecast = forecast_data.get(ATTR_FORECAST_HOURLY, [])
+        self._twice_daily_forecast = forecast_data.get(ATTR_FORECAST_TWICE_DAILY, [])
+
+        if forecast_data:
+            self._attr_extra_state_attributes[ATTR_FORECAST_DATA_COMPRESSED] = (
+                compress_data(forecast_data)
+            )
+
     def _handle_coordinator_update(self) -> None:
         self._attr_available = True
         self.update_condition_and_fire_event(
             new_condition=self.coordinator.data.get(ATTR_API_CONDITION)
         )
         self._attr_entity_picture = self.coordinator.data.get(ATTR_API_IMAGE)
-        self._hourly_forecast = self.coordinator.data.get(ATTR_FORECAST_DATA, [])
         self._attr_native_temperature = self.coordinator.data.get(ATTR_API_TEMPERATURE)
         self._attr_native_wind_speed = self.coordinator.data.get(ATTR_API_WIND_SPEED)
         self._attr_wind_bearing = self.coordinator.data.get(ATTR_API_WIND_BEARING)
@@ -187,8 +211,14 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
         _LOGGER.debug(f"_handle_coordinator_update: {self._hourly_forecast=}")
         self._attr_extra_state_attributes = {
             ATTR_API_YA_CONDITION: self.coordinator.data.get(ATTR_API_YA_CONDITION),
-            ATTR_API_FORECAST_ICONS: self.coordinator.data.get(ATTR_API_FORECAST_ICONS),
+            ATTR_FORECAST_HOURLY_ICONS: self.coordinator.data.get(
+                ATTR_FORECAST_HOURLY_ICONS
+            ),
+            ATTR_FORECAST_TWICE_DAILY_ICONS: self.coordinator.data.get(
+                ATTR_FORECAST_TWICE_DAILY_ICONS
+            ),
         }
+        self._update_forecast_data(self.coordinator.data.get(ATTR_FORECAST_DATA, {}))
         self.async_write_ha_state()
 
     def update_condition_and_fire_event(self, new_condition: str):
@@ -208,14 +238,15 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
 
         self._attr_condition = new_condition
 
-    def __forecast_hourly(self) -> list[Forecast] | None:
-        """Return the daily forecast in native units."""
-        return [] if self._hourly_forecast is None else self._hourly_forecast
-
     async def async_forecast_hourly(self) -> list[Forecast] | None:
         """Return the hourly forecast in native units.
 
         Only implement this method if `WeatherEntityFeature.FORECAST_HOURLY` is set
         """
         _LOGGER.debug(f"async_forecast_hourly: {self._hourly_forecast=}")
-        return self.__forecast_hourly()
+        return self._hourly_forecast if self._hourly_forecast else []
+
+    async def async_forecast_twice_daily(self) -> list[Forecast] | None:
+        """Return the daily forecast in native units."""
+        _LOGGER.debug(f"async_forecast_twice_daily: {self._twice_daily_forecast=}")
+        return self._twice_daily_forecast if self._twice_daily_forecast else []

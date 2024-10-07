@@ -3,7 +3,11 @@
 import pytest
 from homeassistant.components.weather import ATTR_FORECAST_NATIVE_TEMP
 
-from custom_components.yandex_pogoda.const import ATTR_MIN_FORECAST_TEMPERATURE
+from custom_components.yandex_pogoda.const import (
+    ATTR_MIN_FORECAST_TEMPERATURE,
+    ATTR_API_SUNRISE_BEGIN_TIME,
+    ATTR_API_SUNRISE_END_TIME,
+)
 from custom_components.yandex_pogoda.updater import WeatherUpdater
 
 
@@ -18,7 +22,7 @@ scenarios = {
         ("windGust", 9.1),
         ("windSpeed", 5.8),
         ("yandex_condition_icon", "mdi:weather-sunny"),
-        (ATTR_MIN_FORECAST_TEMPERATURE, 25),
+        (ATTR_MIN_FORECAST_TEMPERATURE, 24),
     ],
 }
 

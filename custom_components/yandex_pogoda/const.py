@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import logging
+import pickle
+import zlib
 
 from collections.abc import Callable
 
@@ -24,25 +27,31 @@ MANUFACTURER = "Yandex"
 ENTRY_NAME = "name"
 UPDATER = "updater"
 
-API_DAY_PARTS = (("night", 2), ("morning", 9), ("day", 15), ("evening", 20))
-
 ATTR_API_TEMPERATURE = "temperature"
+ATTR_API_TEMPERATURE_MAX = "maxTemperature"
+ATTR_API_TEMPERATURE_MIN = "minTemperature"
 ATTR_API_FEELS_LIKE_TEMPERATURE = "feelsLike"
 ATTR_API_WIND_SPEED = "windSpeed"
 ATTR_API_WIND_BEARING = "windAngle"
-ATTR_WIND_INTERCARDINAL_DIRECTION = "wind_intercardinal"
-
 ATTR_API_DAYTIME = "daytime"
 ATTR_API_CONDITION = "condition"
 ATTR_API_IMAGE = "icon"
 ATTR_API_SERVER_TIME = "serverTime"
 ATTR_API_TIME = "time"
+ATTR_API_SUNRISE_BEGIN_TIME = "sunriseBeginTime"
+ATTR_API_SUNRISE_END_TIME = "sunsetEndTime"
 ATTR_API_YA_CONDITION = "yandex_condition"
 ATTR_API_WIND_GUST = "windGust"
-ATTR_MIN_FORECAST_TEMPERATURE = "min_forecast_temperature"
-ATTR_API_FORECAST_ICONS = "forecast_icons"
 
 ATTR_FORECAST_DATA = "forecast"
+ATTR_FORECAST_DATA_COMPRESSED = "forecast_compressed"
+ATTR_FORECAST_HOURLY = "hourly"
+ATTR_FORECAST_HOURLY_ICONS = "forecast_hourly_icons"
+ATTR_FORECAST_TWICE_DAILY = "twice_daily"
+ATTR_FORECAST_TWICE_DAILY_ICONS = "forecast_twice_daily_icons"
+
+ATTR_MIN_FORECAST_TEMPERATURE = "min_forecast_temperature"
+ATTR_WIND_INTERCARDINAL_DIRECTION = "wind_intercardinal"
 
 UPDATE_LISTENER = "update_listener"
 PLATFORMS = [Platform.SENSOR, Platform.WEATHER]
@@ -130,9 +139,9 @@ WIND_SPEED_CONVERTER = UNIT_CONVERSIONS[ATTR_WEATHER_WIND_SPEED_UNIT]
 
 def convert_unit_value(
     converter: Callable[[float, str, str], float],
-    val: float,
-    unit_from: str,
-    unit_to: str,
+    val: float | None,
+    unit_from: str | None,
+    unit_to: str | None,
 ) -> float | None:
     """Weather factor unit converter."""
     if val is not None and unit_from and unit_to:
@@ -193,3 +202,19 @@ def get_wind_intercardinal_direction(wind_direction_degree: int) -> str:
         return "nw"
 
     return "n"
+
+
+def compress_data(data: dict) -> str:
+    """Compress dict to string."""
+    return base64.b64encode(zlib.compress(pickle.dumps(data))).decode("utf-8")
+
+
+def decompress_data(compressed: str | None) -> dict:
+    """Compress dict to string."""
+    if not compressed:
+        return {}
+
+    try:
+        return pickle.loads(zlib.decompress(base64.b64decode(compressed)))
+    except TypeError:  # for backward compatibility
+        return {}

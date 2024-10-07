@@ -24,6 +24,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     latitude = get_value(entry, CONF_LATITUDE, hass.config.latitude)
     longitude = get_value(entry, CONF_LONGITUDE, hass.config.longitude)
 
+    hass.data.setdefault(DOMAIN, {})
+    device_data = hass.data[DOMAIN].get(entry.unique_id, {})
+    weather_data = device_data.get("weather_data")
+    device_data["weather_data"] = None
+
     weather_updater = WeatherUpdater(
         latitude=latitude,
         longitude=longitude,
@@ -31,17 +36,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass=hass,
         device_id=entry.unique_id,
         name=name,
+        weather_data=weather_data,
     )
-
-    hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
         ENTRY_NAME: name,
         UPDATER: weather_updater,
     }
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     update_listener = entry.add_update_listener(async_update_options)
     hass.data[DOMAIN][entry.entry_id][UPDATE_LISTENER] = update_listener
+
+    if weather_updater.is_first_update_requred:
+        await weather_updater.async_request_refresh()
 
     return True
 
