@@ -48,8 +48,14 @@ class YandexWeatherConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(f"{uuid.uuid4()}")
             self._abort_if_unique_id_configured()
 
-            if await _is_online(api_key, latitude, longitude, self.hass):
+            weather = await _is_online(api_key, latitude, longitude, self.hass)
+            if weather.last_update_success:
                 user_input[CONF_API_KEY] = api_key
+
+                self.hass.data.setdefault(DOMAIN, {})
+                self.hass.data[DOMAIN][self.unique_id] = {
+                    "weather_data": weather.weather_data
+                }
                 return self.async_create_entry(
                     title=user_input[CONF_NAME], data=user_input
                 )
@@ -84,13 +90,20 @@ class YandexWeatherOptionsFlow(config_entries.OptionsFlow):
         errors = {}
         if user_input is not None:
             api_key = user_input[CONF_API_KEY].strip()
-            if await _is_online(
+            weather = await _is_online(
                 api_key,
                 user_input[CONF_LATITUDE],
                 user_input[CONF_LONGITUDE],
                 self.hass,
-            ):
+            )
+            if weather.last_update_success:
                 user_input[CONF_API_KEY] = api_key
+
+                self.hass.data.setdefault(DOMAIN, {})
+                self.hass.data[DOMAIN][self.config_entry.unique_id] = {
+                    "weather_data": weather.weather_data
+                }
+
                 return self.async_create_entry(title="", data=user_input)
 
             errors["base"] = "could_not_get_data"
@@ -118,4 +131,4 @@ class YandexWeatherOptionsFlow(config_entries.OptionsFlow):
 async def _is_online(api_key, lat, lon, hass: HomeAssistant) -> bool:
     weather = WeatherUpdater(lat, lon, api_key, hass, f"{uuid.uuid4()}")
     await weather.async_request_refresh()
-    return weather.last_update_success
+    return weather
