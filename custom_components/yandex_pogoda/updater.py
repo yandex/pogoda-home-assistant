@@ -78,7 +78,7 @@ API_QUERY_TEMPLATE = f"""{{
             {ATTR_API_WIND_SPEED}
         }}
         forecast {{
-            days(limit: 3){{
+            days {{
                 {ATTR_API_TIME}
                 {ATTR_API_SUNRISE_BEGIN_TIME}
                 {ATTR_API_SUNRISE_END_TIME}
