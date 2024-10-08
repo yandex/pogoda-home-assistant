@@ -208,6 +208,9 @@ class YandexWeatherSensor(SensorEntity, CoordinatorEntity, RestoreEntity):
                         self.native_unit_of_measurement,
                     )
                 )
+            elif self.entity_description.key == ATTR_API_YA_CONDITION:
+                if state.state in YA_CONDITION_STATES:  # for backward compatibility
+                    self._attr_native_value = state.state
             else:
                 self._attr_native_value = state.state
 

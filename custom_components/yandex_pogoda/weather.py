@@ -33,7 +33,6 @@ from .const import (
     ATTR_API_WIND_SPEED,
     ATTR_API_YA_CONDITION,
     ATTR_FORECAST_DATA,
-    ATTR_FORECAST_DATA_COMPRESSED,
     ATTR_FORECAST_HOURLY,
     ATTR_FORECAST_HOURLY_ICONS,
     ATTR_FORECAST_TWICE_DAILY,
@@ -44,9 +43,7 @@ from .const import (
     TEMPERATURE_CONVERTER,
     UPDATER,
     WIND_SPEED_CONVERTER,
-    compress_data,
     convert_unit_value,
-    decompress_data,
 )
 from .device_trigger import TRIGGERS
 from .updater import WeatherUpdater
@@ -87,7 +84,14 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
     _attr_supported_features = (
         WeatherEntityFeature.FORECAST_HOURLY | WeatherEntityFeature.FORECAST_TWICE_DAILY
     )
-
+    _unrecorded_attributes = frozenset(
+        {
+            "forecast_hourly",
+            "forecast_twice_daily",
+            ATTR_FORECAST_HOURLY_ICONS,
+            ATTR_FORECAST_TWICE_DAILY_ICONS,
+        }
+    )
     coordinator: WeatherUpdater
 
     def __init__(
@@ -157,9 +161,12 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
             self._attr_entity_picture = state.attributes.get("entity_picture")
 
             self._attr_extra_state_attributes = {}
-            self._update_forecast_data(
-                decompress_data(state.attributes.get(ATTR_FORECAST_DATA_COMPRESSED))
-            )
+
+            f_data = {
+                ATTR_FORECAST_HOURLY: state.attributes.get("forecast_hourly"),
+                ATTR_FORECAST_TWICE_DAILY: state.attributes.get("forecast_twice_daily"),
+            }
+            self._update_forecast_data(f_data)
             for attr in (
                 ATTR_API_YA_CONDITION,
                 ATTR_FORECAST_HOURLY_ICONS,
@@ -184,14 +191,13 @@ class YandexWeather(WeatherEntity, CoordinatorEntity, RestoreEntity):
                 )
         self.async_write_ha_state()
 
-    def _update_forecast_data(self, forecast_data: dict):  # uncompressed
+    def _update_forecast_data(self, forecast_data: dict):
         self._hourly_forecast = forecast_data.get(ATTR_FORECAST_HOURLY, [])
         self._twice_daily_forecast = forecast_data.get(ATTR_FORECAST_TWICE_DAILY, [])
-
-        if forecast_data:
-            self._attr_extra_state_attributes[ATTR_FORECAST_DATA_COMPRESSED] = (
-                compress_data(forecast_data)
-            )
+        self._attr_extra_state_attributes["forecast_hourly"] = self._hourly_forecast
+        self._attr_extra_state_attributes["forecast_twice_daily"] = (
+            self._twice_daily_forecast
+        )
 
     def _handle_coordinator_update(self) -> None:
         self._attr_available = True
