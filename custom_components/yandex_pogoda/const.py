@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "yandex_pogoda"
 DEFAULT_NAME = "Yandex Pogoda"
-DEFAULT_UPDATES_PER_DAY = 12
+DEFAULT_UPDATES_PER_DAY = 24
 ATTRIBUTION = "Data provided by Yandex Pogoda"
 MANUFACTURER = "Yandex"
 ENTRY_NAME = "name"
