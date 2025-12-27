@@ -1,6 +1,6 @@
 pytest-homeassistant-custom-component==0.13.195
 bleak==0.22.3
-pycares==4.8.0
+pycares==4.9.0
 multidict==6.4.4
 frozenlist==1.6.2
 certifi==2025.4.26
